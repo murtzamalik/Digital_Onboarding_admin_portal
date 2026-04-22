@@ -1,5 +1,13 @@
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Link as MuiLink,
+  Stack,
+  Typography,
+} from '@mui/material'
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
 
@@ -11,6 +19,29 @@ type CorporateClientDetail = {
   status: string
   createdAt: string
   updatedAt: string
+}
+
+function DetailRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      spacing={1}
+      sx={{
+        py: 1,
+        borderBottom: 1,
+        borderColor: 'divider',
+        justifyContent: 'space-between',
+        gap: 1,
+      }}
+    >
+      <Typography variant="body2" color="text.secondary" sx={{ minWidth: { sm: 140 }, flexShrink: 0 }}>
+        {label}
+      </Typography>
+      <Typography variant="body2" sx={{ fontWeight: 500, textAlign: { sm: 'right' }, wordBreak: 'break-word' }}>
+        {children}
+      </Typography>
+    </Stack>
+  )
 }
 
 export function ClientDetailPage() {
@@ -55,50 +86,58 @@ export function ClientDetailPage() {
   }, [id])
 
   return (
-    <section className="page">
-      <p className="page__hint">
-        <Link to="/clients">← Back to clients</Link>
-      </p>
-      <h1>Client detail</h1>
-      {loading ? <p className="page__hint">Loading…</p> : null}
-      {error ? <p className="page__error">{error}</p> : null}
-      {detail && !loading ? (
-        <dl className="detail-list">
-          <div className="detail-list__row">
-            <dt>ID</dt>
-            <dd>{detail.id}</dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Public ID</dt>
-            <dd>
-              <code>{detail.publicId}</code>
-            </dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Client code</dt>
-            <dd>{detail.clientCode}</dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Legal name</dt>
-            <dd>{detail.legalName}</dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Status</dt>
-            <dd>{detail.status}</dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Created</dt>
-            <dd>{detail.createdAt}</dd>
-          </div>
-          <div className="detail-list__row">
-            <dt>Updated</dt>
-            <dd>{detail.updatedAt}</dd>
-          </div>
-        </dl>
+    <Box
+      component="section"
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      <Typography variant="body2" sx={{ mb: 2 }}>
+        <MuiLink component={Link} to="/clients" underline="hover">
+          ← Back to clients
+        </MuiLink>
+      </Typography>
+      <Typography variant="h6" component="h1" gutterBottom>
+        Client detail
+      </Typography>
+
+      {loading ? (
+        <Stack spacing={1} sx={{ py: 2, flexDirection: 'row', alignItems: 'center' }}>
+          <CircularProgress size={22} />
+          <Typography variant="body2" color="text.secondary">
+            Loading…
+          </Typography>
+        </Stack>
       ) : null}
-      <p className="page__hint">
+      {error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      ) : null}
+
+      {detail && !loading ? (
+        <Box sx={{ maxWidth: 560, mt: 1 }}>
+          <DetailRow label="ID">{detail.id}</DetailRow>
+          <DetailRow label="Public ID">
+            <Typography component="code" variant="body2">
+              {detail.publicId}
+            </Typography>
+          </DetailRow>
+          <DetailRow label="Client code">{detail.clientCode}</DetailRow>
+          <DetailRow label="Legal name">{detail.legalName}</DetailRow>
+          <DetailRow label="Status">{detail.status}</DetailRow>
+          <DetailRow label="Created">{detail.createdAt}</DetailRow>
+          <DetailRow label="Updated">{detail.updatedAt}</DetailRow>
+        </Box>
+      ) : null}
+
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 3, mb: 0 }}>
         Data from <code>{'/api/v1/admin/clients/{id}'}</code>.
-      </p>
-    </section>
+      </Typography>
+    </Box>
   )
 }

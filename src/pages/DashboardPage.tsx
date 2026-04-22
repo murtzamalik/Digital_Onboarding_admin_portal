@@ -1,3 +1,11 @@
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { apiClient } from '../api/client'
 
@@ -7,6 +15,13 @@ type Summary = {
   correctionBatchCount: number
   employeesInProgressCount: number
 }
+
+const statItems: { key: keyof Summary; label: string }[] = [
+  { key: 'corporateClientCount', label: 'Corporate clients' },
+  { key: 'uploadBatchCount', label: 'Upload batches' },
+  { key: 'correctionBatchCount', label: 'Correction batches' },
+  { key: 'employeesInProgressCount', label: 'Employees in progress' },
+]
 
 export function DashboardPage() {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -40,33 +55,60 @@ export function DashboardPage() {
   }, [])
 
   return (
-    <section className="page">
-      <h1>Dashboard</h1>
-      {loading ? <p className="page__hint">Loading…</p> : null}
-      {error ? <p className="page__error">{error}</p> : null}
-      {summary && !loading ? (
-        <dl className="dashboard-stats">
-          <div className="dashboard-stats__row">
-            <dt>Corporate clients</dt>
-            <dd>{summary.corporateClientCount}</dd>
-          </div>
-          <div className="dashboard-stats__row">
-            <dt>Upload batches</dt>
-            <dd>{summary.uploadBatchCount}</dd>
-          </div>
-          <div className="dashboard-stats__row">
-            <dt>Correction batches</dt>
-            <dd>{summary.correctionBatchCount}</dd>
-          </div>
-          <div className="dashboard-stats__row">
-            <dt>Employees in progress</dt>
-            <dd>{summary.employeesInProgressCount}</dd>
-          </div>
-        </dl>
+    <Box
+      component="section"
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      <Typography variant="h6" component="h1" gutterBottom>
+        Dashboard
+      </Typography>
+
+      {loading ? (
+        <Stack spacing={1} sx={{ py: 2, flexDirection: 'row', alignItems: 'center' }}>
+          <CircularProgress size={22} />
+          <Typography variant="body2" color="text.secondary">
+            Loading…
+          </Typography>
+        </Stack>
       ) : null}
-      <p className="page__hint">
+      {error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      ) : null}
+
+      {summary && !loading ? (
+        <Stack
+          spacing={2}
+          sx={{
+            mb: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
+          {statItems.map(({ key, label }) => (
+            <Paper key={key} variant="outlined" sx={{ flex: '1 1 160px', p: 2, minWidth: 0 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                {label}
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ mt: 0.5, fontWeight: 600 }}>
+                {summary[key]}
+              </Typography>
+            </Paper>
+          ))}
+        </Stack>
+      ) : null}
+
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ m: 0 }}>
         Status-driven backend: counts come from <code>/api/v1/admin/dashboard/summary</code>.
-      </p>
-    </section>
+      </Typography>
+    </Box>
   )
 }

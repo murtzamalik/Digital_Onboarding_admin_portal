@@ -1,5 +1,21 @@
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Link as MuiLink,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { apiClient } from '../api/client'
 
 type CorporateClientRow = {
@@ -59,71 +75,100 @@ export function ClientsPage() {
   }, [page])
 
   return (
-    <section className="page">
-      <h1>Corporate clients</h1>
-      {loading ? <p className="page__hint">Loading…</p> : null}
-      {error ? <p className="page__error">{error}</p> : null}
+    <Box
+      component="section"
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      <Typography variant="h6" component="h1" gutterBottom>
+        Corporate clients
+      </Typography>
+
+      {loading ? (
+        <Stack spacing={1} sx={{ py: 2, flexDirection: 'row', alignItems: 'center' }}>
+          <CircularProgress size={22} />
+          <Typography variant="body2" color="text.secondary">
+            Loading…
+          </Typography>
+        </Stack>
+      ) : null}
+      {error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      ) : null}
+
       {data && !loading ? (
         <>
-          <p className="page__hint">
-            {data.totalElements} client{data.totalElements === 1 ? '' : 's'} (page {data.number + 1}{' '}
-            of {Math.max(1, data.totalPages)}).
-          </p>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Legal name</th>
-                <th>Code</th>
-                <th>Status</th>
-                <th>Public ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.content.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="data-table__empty">
-                    No clients yet.
-                  </td>
-                </tr>
-              ) : (
-                data.content.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <Link to={`/clients/${row.id}`}>{row.legalName}</Link>
-                    </td>
-                    <td>{row.clientCode}</td>
-                    <td>{row.status}</td>
-                    <td>
-                      <code>{row.publicId}</code>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          <div className="pager">
-            <button
-              type="button"
-              className="page__button pager__btn"
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {data.totalElements} client{data.totalElements === 1 ? '' : 's'} (page {data.number + 1} of{' '}
+            {Math.max(1, data.totalPages)}).
+          </Typography>
+          <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Legal name</TableCell>
+                  <TableCell>Code</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Public ID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.content.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary' }}>
+                      No clients yet.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  data.content.map((row) => (
+                    <TableRow key={row.id} hover>
+                      <TableCell>
+                        <MuiLink component={RouterLink} to={`/clients/${row.id}`} underline="hover">
+                          {row.legalName}
+                        </MuiLink>
+                      </TableCell>
+                      <TableCell>{row.clientCode}</TableCell>
+                      <TableCell>{row.status}</TableCell>
+                      <TableCell>
+                        <Typography component="code" variant="body2">
+                          {row.publicId}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Stack spacing={1} sx={{ mb: 2, flexDirection: 'row' }}>
+            <Button
+              variant="outlined"
               disabled={page <= 0}
               onClick={() => setPage((p) => Math.max(0, p - 1))}
             >
               Previous
-            </button>
-            <button
-              type="button"
-              className="page__button pager__btn"
+            </Button>
+            <Button
+              variant="outlined"
               disabled={data.totalPages <= 0 || page >= data.totalPages - 1}
               onClick={() => setPage((p) => p + 1)}
             >
               Next
-            </button>
-          </div>
+            </Button>
+          </Stack>
         </>
       ) : null}
-      <p className="page__hint">
+
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ m: 0 }}>
         Data from <code>/api/v1/admin/clients</code> (paged).
-      </p>
-    </section>
+      </Typography>
+    </Box>
   )
 }

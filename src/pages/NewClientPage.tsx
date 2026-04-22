@@ -1,7 +1,18 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Link as MuiLink,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { type FormEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAdminOutletContext } from '../adminOutletContext'
 import { apiClient } from '../api/client'
-import { type AdminSession, canMutateClients } from '../api/types'
+import { canMutateClients } from '../api/types'
 
 type CreatedClient = {
   id: number
@@ -12,24 +23,9 @@ type CreatedClient = {
 }
 
 export function NewClientPage() {
-  const [session, setSession] = useState<AdminSession | null>(null)
+  const { session, sessionReady } = useAdminOutletContext()
   const [message, setMessage] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const { data } = await apiClient.get<AdminSession>('/session')
-        if (!cancelled) setSession(data)
-      } catch {
-        if (!cancelled) setSession(null)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -54,38 +50,69 @@ export function NewClientPage() {
     }
   }
 
-  if (session && !canMutateClients(session)) {
-    return (
-      <section className="page">
-        <h1>New client</h1>
-        <p className="page__error">Your role cannot create corporate clients.</p>
-        <p>
-          <Link to="/clients">← Clients</Link>
-        </p>
-      </section>
-    )
-  }
-
-  return (
-    <section className="page">
-      <h1>New corporate client</h1>
-      <p className="page__hint">
-        <Link to="/clients">← All clients</Link>
-      </p>
-      <form className="page__form" onSubmit={onSubmit}>
-        <label className="page__label">
-          Client code
-          <input className="page__input" name="clientCode" required maxLength={64} />
-        </label>
-        <label className="page__label">
-          Legal name
-          <input className="page__input" name="legalName" required maxLength={512} />
-        </label>
-        {message ? <p className="page__hint">{message}</p> : null}
-        <button className="page__button" type="submit" disabled={busy}>
-          {busy ? 'Creating…' : 'Create client'}
-        </button>
-      </form>
-    </section>
+  const shell = (
+    <Box
+      component="section"
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      {!sessionReady ? (
+        <Stack spacing={2} sx={{ flexDirection: 'row', alignItems: 'center', py: 2 }}>
+          <CircularProgress size={24} />
+          <Typography variant="body2" color="text.secondary">
+            Loading…
+          </Typography>
+        </Stack>
+      ) : !session ? (
+        <>
+          <Typography variant="h6" component="h1" gutterBottom>
+            New client
+          </Typography>
+          <Alert severity="warning">Could not load your session. Try signing in again.</Alert>
+        </>
+      ) : !canMutateClients(session) ? (
+        <>
+          <Typography variant="h6" component="h1" gutterBottom>
+            New client
+          </Typography>
+          <Alert severity="error">Your role cannot create corporate clients.</Alert>
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            <MuiLink component={Link} to="/clients" underline="hover">
+              ← Clients
+            </MuiLink>
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Typography variant="h6" component="h1" gutterBottom>
+            New corporate client
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            <MuiLink component={Link} to="/clients" underline="hover">
+              ← All clients
+            </MuiLink>
+          </Typography>
+          <Box component="form" onSubmit={onSubmit}>
+            <Stack spacing={2} sx={{ maxWidth: 420 }}>
+              <TextField name="clientCode" label="Client code" required fullWidth slotProps={{ htmlInput: { maxLength: 64 } }} />
+              <TextField name="legalName" label="Legal name" required fullWidth slotProps={{ htmlInput: { maxLength: 512 } }} />
+              {message ? (
+                <Alert severity={message.includes('failed') ? 'error' : 'success'}>{message}</Alert>
+              ) : null}
+              <Button type="submit" disabled={busy} sx={{ alignSelf: 'flex-start' }}>
+                {busy ? 'Creating…' : 'Create client'}
+              </Button>
+            </Stack>
+          </Box>
+        </>
+      )}
+    </Box>
   )
+
+  return shell
 }

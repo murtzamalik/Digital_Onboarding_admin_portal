@@ -1,3 +1,23 @@
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { apiClient } from '../api/client'
 import { type SpringPage } from '../api/types'
@@ -49,110 +69,143 @@ export function EmployeesPage() {
   }, [page, status, appliedQ])
 
   return (
-    <section className="page">
-      <h1>Employees</h1>
-      <p className="page__hint">Global search over onboarding records (paged).</p>
-      <div className="page__form" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-end' }}>
-        <label className="page__label">
-          Status
-          <select
-            className="page__input"
+    <Box
+      component="section"
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      <Typography variant="h6" component="h1" gutterBottom>
+        Employees
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Global search over onboarding records (paged).
+      </Typography>
+
+      <Stack spacing={2} sx={{ mb: 3, flexWrap: 'wrap', flexDirection: 'row', alignItems: 'flex-end', gap: 2 }}>
+        <FormControl size="small" sx={{ minWidth: 220 }}>
+          <InputLabel id="emp-status-label">Status</InputLabel>
+          <Select
+            labelId="emp-status-label"
+            label="Status"
             value={status}
             onChange={(e) => {
               setPage(0)
               setStatus(e.target.value)
             }}
           >
-            <option value="">Any</option>
-            <option value="AML_CHECK_PENDING">AML_CHECK_PENDING</option>
-            <option value="AML_REJECTED">AML_REJECTED</option>
-            <option value="INVITED">INVITED</option>
-            <option value="BLOCKED">BLOCKED</option>
-            <option value="T24_PENDING">T24_PENDING</option>
-          </select>
-        </label>
-        <label className="page__label">
-          Search (ref / name)
-          <input
-            className="page__input"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="E2E-EMP-001"
-          />
-        </label>
-        <button
+            <MenuItem value="">Any</MenuItem>
+            <MenuItem value="AML_CHECK_PENDING">AML_CHECK_PENDING</MenuItem>
+            <MenuItem value="AML_REJECTED">AML_REJECTED</MenuItem>
+            <MenuItem value="INVITED">INVITED</MenuItem>
+            <MenuItem value="BLOCKED">BLOCKED</MenuItem>
+            <MenuItem value="T24_PENDING">T24_PENDING</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          size="small"
+          label="Search (ref / name)"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="E2E-EMP-001"
+          sx={{ minWidth: 200 }}
+        />
+        <Button
           type="button"
-          className="page__button"
+          variant="outlined"
           onClick={() => {
             setPage(0)
             setAppliedQ(q)
           }}
         >
           Apply
-        </button>
-      </div>
-      {loading ? <p className="page__hint">Loading…</p> : null}
-      {error ? <p className="page__error">{error}</p> : null}
+        </Button>
+      </Stack>
+
+      {loading ? (
+        <Stack spacing={1} sx={{ py: 2, flexDirection: 'row', alignItems: 'center' }}>
+          <CircularProgress size={22} />
+          <Typography variant="body2" color="text.secondary">
+            Loading…
+          </Typography>
+        </Stack>
+      ) : null}
+      {error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      ) : null}
+
       {data && !loading ? (
         <>
-          <p className="page__hint">
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Page {data.number + 1} of {Math.max(1, data.totalPages)} · {data.totalElements} rows
-          </p>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Ref</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Client</th>
-                <th>AML</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.content.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="data-table__empty">
-                    No rows.
-                  </td>
-                </tr>
-              ) : (
-                data.content.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <code>{row.employeeRef}</code>
-                    </td>
-                    <td>{row.fullName}</td>
-                    <td>{row.status}</td>
-                    <td>{row.corporateClientId}</td>
-                    <td>
-                      {row.amlCaseReference ? <code>{row.amlCaseReference}</code> : '—'}{' '}
-                      <span className="page__hint">{row.amlScreeningStatus ?? ''}</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          <div className="pager">
-            <button
-              type="button"
-              className="page__button pager__btn"
-              disabled={page <= 0}
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-            >
+          </Typography>
+          <TableContainer component={Paper} variant="outlined" sx={{ mb: 2, overflowX: 'auto' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ref</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Client</TableCell>
+                  <TableCell>AML</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.content.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary' }}>
+                      No rows.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  data.content.map((row) => (
+                    <TableRow key={row.id} hover>
+                      <TableCell>
+                        <Typography component="code" variant="body2">
+                          {row.employeeRef}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{row.fullName}</TableCell>
+                      <TableCell>{row.status}</TableCell>
+                      <TableCell>{row.corporateClientId}</TableCell>
+                      <TableCell>
+                        {row.amlCaseReference ? (
+                          <Typography component="code" variant="body2">
+                            {row.amlCaseReference}
+                          </Typography>
+                        ) : (
+                          '—'
+                        )}{' '}
+                        <Typography component="span" variant="caption" color="text.secondary">
+                          {row.amlScreeningStatus ?? ''}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Stack spacing={1} sx={{ flexDirection: 'row' }}>
+            <Button variant="outlined" disabled={page <= 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
               Previous
-            </button>
-            <button
-              type="button"
-              className="page__button pager__btn"
+            </Button>
+            <Button
+              variant="outlined"
               disabled={data.totalPages <= 0 || page >= data.totalPages - 1}
               onClick={() => setPage((p) => p + 1)}
             >
               Next
-            </button>
-          </div>
+            </Button>
+          </Stack>
         </>
       ) : null}
-    </section>
+    </Box>
   )
 }

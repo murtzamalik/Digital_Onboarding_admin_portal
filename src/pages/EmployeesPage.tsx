@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import { type SpringPage } from '../api/types'
 
@@ -154,12 +155,13 @@ export function EmployeesPage() {
                   <TableCell>Status</TableCell>
                   <TableCell>Client</TableCell>
                   <TableCell>AML</TableCell>
+                  <TableCell align="right">Detail</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data.content.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary' }}>
+                    <TableCell colSpan={6} align="center" sx={{ color: 'text.secondary' }}>
                       No rows.
                     </TableCell>
                   </TableRow>
@@ -185,6 +187,16 @@ export function EmployeesPage() {
                         <Typography component="span" variant="caption" color="text.secondary">
                           {row.amlScreeningStatus ?? ''}
                         </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Button
+                          component={Link}
+                          to={`/employees/${encodeURIComponent(row.employeeRef)}`}
+                          size="small"
+                          variant="text"
+                        >
+                          Open
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

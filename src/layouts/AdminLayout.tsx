@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  Container,
   Drawer,
   List,
   ListItem,
@@ -74,10 +75,20 @@ export function AdminLayout() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Toolbar sx={{ gap: 2 }}>
-          <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>
-            Admin portal
+      <AppBar
+        position="sticky"
+        color="inherit"
+        elevation={0}
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          background: (t) =>
+            `linear-gradient(180deg, ${t.palette.background.paper} 0%, ${t.palette.action.hover} 100%)`,
+        }}
+      >
+        <Toolbar sx={{ gap: 2, py: 0.5 }}>
+          <Typography variant="subtitle1" component="span" sx={{ fontWeight: 700, letterSpacing: '0.04em' }}>
+            CEBOS · Bank admin
           </Typography>
           {!sessionReady ? (
             <Chip size="small" label="Loading session…" variant="outlined" sx={{ mr: 'auto' }} />
@@ -119,8 +130,10 @@ export function AdminLayout() {
             {showAdminUsers ? <NavListItem to="/admin-users" label="Admin users" /> : null}
           </List>
         </Drawer>
-        <Box component="main" sx={{ flex: 1, p: 3, overflow: 'auto', bgcolor: 'background.default' }}>
-          <Outlet context={outletContext} />
+        <Box component="main" sx={{ flex: 1, py: 3, px: { xs: 2, md: 3 }, overflow: 'auto', bgcolor: 'background.default' }}>
+          <Container maxWidth="xl">
+            <Outlet context={outletContext} />
+          </Container>
         </Box>
       </Box>
     </Box>

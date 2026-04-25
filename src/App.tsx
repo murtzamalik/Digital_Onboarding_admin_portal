@@ -8,6 +8,7 @@ import { ClientDetailPage } from './pages/ClientDetailPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { ConfigPage } from './pages/ConfigPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { EmployeeDetailPage } from './pages/EmployeeDetailPage'
 import { EmployeesPage } from './pages/EmployeesPage'
 import { LoginPage } from './pages/LoginPage'
 import { NewClientPage } from './pages/NewClientPage'
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/clients/new" element={<NewClientPage />} />
           <Route path="/clients/:id" element={<ClientDetailPage />} />
           <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/employees/:employeeRef" element={<EmployeeDetailPage />} />
           <Route path="/employees" element={<EmployeesPage />} />
           <Route path="/aml" element={<AmlPage />} />
           <Route path="/config" element={<ConfigPage />} />

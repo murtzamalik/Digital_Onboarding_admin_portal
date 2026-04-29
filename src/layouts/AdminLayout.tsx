@@ -2,13 +2,14 @@ import {
   AppBar,
   Box,
   Button,
-  Chip,
   Container,
   Drawer,
+  Divider,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
+  Stack,
   Toolbar,
   Typography,
 } from '@mui/material'
@@ -16,12 +17,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { type AdminOutletContextValue } from '../adminOutletContext'
 import { apiClient } from '../api/client'
-import {
-  type AdminSession,
-  canAmlCompliance,
-  canMutateClients,
-  isSuperAdmin,
-} from '../api/types'
+import { type AdminSession } from '../api/types'
 import { clearAdminAccessToken } from '../auth/token'
 
 const drawerWidth = 240
@@ -31,7 +27,18 @@ function NavListItem({ to, end, label }: { to: string; end?: boolean; label: str
     <ListItem disablePadding sx={{ display: 'block' }}>
       <NavLink to={to} end={end} style={{ textDecoration: 'none', color: 'inherit' }}>
         {({ isActive }) => (
-          <ListItemButton selected={isActive} sx={{ borderRadius: 1, mx: 1, mb: 0.25 }}>
+          <ListItemButton
+            selected={isActive}
+            sx={{
+              borderRadius: 1,
+              mx: 1,
+              mb: 0.25,
+              color: isActive ? '#FFFFFF' : '#94A3B8',
+              backgroundColor: isActive ? '#1E3A8A' : 'transparent',
+              '&.Mui-selected, &.Mui-selected:hover': { backgroundColor: '#1E3A8A' },
+              '&:hover': { backgroundColor: '#1E3A5F' },
+            }}
+          >
             <ListItemText primary={label} slotProps={{ primary: { variant: 'body2' } }} />
           </ListItemButton>
         )}
@@ -67,10 +74,6 @@ export function AdminLayout() {
     navigate('/login', { replace: true })
   }
 
-  const showNewClient = sessionReady && canMutateClients(session)
-  const showAml = sessionReady && canAmlCompliance(session)
-  const showAdminUsers = sessionReady && isSuperAdmin(session)
-
   const outletContext: AdminOutletContextValue = { session, sessionReady }
 
   return (
@@ -86,17 +89,15 @@ export function AdminLayout() {
             `linear-gradient(180deg, ${t.palette.background.paper} 0%, ${t.palette.action.hover} 100%)`,
         }}
       >
-        <Toolbar sx={{ gap: 2, py: 0.5 }}>
-          <Typography variant="subtitle1" component="span" sx={{ fontWeight: 700, letterSpacing: '0.04em' }}>
-            CEBOS · Bank admin
-          </Typography>
-          {!sessionReady ? (
-            <Chip size="small" label="Loading session…" variant="outlined" sx={{ mr: 'auto' }} />
-          ) : session ? (
-            <Chip size="small" label={`User ${session.bankAdminUserId}`} variant="outlined" sx={{ mr: 'auto' }} />
-          ) : (
-            <Box sx={{ flex: 1 }} />
-          )}
+        <Toolbar sx={{ gap: 2, py: 0.5, justifyContent: 'space-between' }}>
+          <Stack spacing={0.25}>
+            <Typography variant="subtitle1" component="span" sx={{ fontWeight: 700, letterSpacing: '0.04em' }}>
+              CEBOS · Admin portal
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {sessionReady && session ? `Last login: Active · User ${session.bankAdminUserId}` : 'Loading session...'}
+            </Typography>
+          </Stack>
           <Button variant="outlined" color="inherit" onClick={signOut} sx={{ textTransform: 'none' }}>
             Sign out
           </Button>
@@ -114,20 +115,34 @@ export function AdminLayout() {
               position: 'relative',
               borderRight: 1,
               borderColor: 'divider',
-              bgcolor: 'background.paper',
+              bgcolor: '#0F2044',
+              color: '#94A3B8',
             },
           }}
           open
         >
           <List dense sx={{ pt: 1 }}>
+            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: '#475569', letterSpacing: 1 }}>
+              OVERVIEW
+            </Typography>
             <NavListItem to="/dashboard" label="Dashboard" />
-            <NavListItem to="/clients" end label="Clients" />
-            {showNewClient ? <NavListItem to="/clients/new" label="New client" /> : null}
-            <NavListItem to="/employees" label="Employees" />
-            {showAml ? <NavListItem to="/aml" label="AML" /> : null}
-            <NavListItem to="/config" label="Config" />
-            <NavListItem to="/audit" label="Audit" />
-            {showAdminUsers ? <NavListItem to="/admin-users" label="Admin users" /> : null}
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: '#475569', letterSpacing: 1 }}>
+              COMPANIES
+            </Typography>
+            <NavListItem to="/clients" end label="All Companies" />
+            <NavListItem to="/clients/new" label="Onboard Company" />
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: '#475569', letterSpacing: 1 }}>
+              BATCHES
+            </Typography>
+            <NavListItem to="/batches" end label="Batch Monitor" />
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: '#475569', letterSpacing: 1 }}>
+              SYSTEM
+            </Typography>
+            <NavListItem to="/config" label="Configuration" />
+            <NavListItem to="/audit" label="Audit Log" />
           </List>
         </Drawer>
         <Box component="main" sx={{ flex: 1, py: 3, px: { xs: 2, md: 3 }, overflow: 'auto', bgcolor: 'background.default' }}>

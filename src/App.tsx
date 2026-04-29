@@ -1,17 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AdminLayout } from './layouts/AdminLayout'
 import { ProtectedLayout } from './layouts/ProtectedLayout'
-import { AdminUsersPage } from './pages/AdminUsersPage'
-import { AmlPage } from './pages/AmlPage'
 import { AuditPage } from './pages/AuditPage'
 import { ClientDetailPage } from './pages/ClientDetailPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { ConfigPage } from './pages/ConfigPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { EmployeeDetailPage } from './pages/EmployeeDetailPage'
-import { EmployeesPage } from './pages/EmployeesPage'
 import { LoginPage } from './pages/LoginPage'
 import { NewClientPage } from './pages/NewClientPage'
+import { BatchMonitorPage } from './pages/BatchMonitorPage'
+import { BatchDetailPage } from './pages/BatchDetailPage'
 
 export default function App() {
   return (
@@ -20,15 +18,13 @@ export default function App() {
       <Route element={<ProtectedLayout />}>
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/clients" element={<ClientsPage />} />
           <Route path="/clients/new" element={<NewClientPage />} />
           <Route path="/clients/:id" element={<ClientDetailPage />} />
-          <Route path="/clients" element={<ClientsPage />} />
-          <Route path="/employees/:employeeRef" element={<EmployeeDetailPage />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-          <Route path="/aml" element={<AmlPage />} />
+          <Route path="/batches" element={<BatchMonitorPage />} />
+          <Route path="/batches/:batchRef" element={<BatchDetailPage />} />
           <Route path="/config" element={<ConfigPage />} />
           <Route path="/audit" element={<AuditPage />} />
-          <Route path="/admin-users" element={<AdminUsersPage />} />
         </Route>
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

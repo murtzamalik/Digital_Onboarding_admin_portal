@@ -1,8 +1,10 @@
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   Link as MuiLink,
+  Paper,
   Stack,
   Typography,
 } from '@mui/material'
@@ -102,7 +104,7 @@ export function ClientDetailPage() {
         </MuiLink>
       </Typography>
       <Typography variant="h6" component="h1" gutterBottom>
-        Client detail
+        Company detail
       </Typography>
 
       {loading ? (
@@ -120,19 +122,37 @@ export function ClientDetailPage() {
       ) : null}
 
       {detail && !loading ? (
-        <Box sx={{ maxWidth: 560, mt: 1 }}>
-          <DetailRow label="ID">{detail.id}</DetailRow>
-          <DetailRow label="Public ID">
-            <Typography component="code" variant="body2">
-              {detail.publicId}
-            </Typography>
-          </DetailRow>
-          <DetailRow label="Client code">{detail.clientCode}</DetailRow>
-          <DetailRow label="Legal name">{detail.legalName}</DetailRow>
-          <DetailRow label="Status">{detail.status}</DetailRow>
-          <DetailRow label="Created">{detail.createdAt}</DetailRow>
-          <DetailRow label="Updated">{detail.updatedAt}</DetailRow>
-        </Box>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between' }}>
+              <Box>
+                <Typography variant="h6">{detail.legalName}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {detail.clientCode} · {detail.publicId}
+                </Typography>
+              </Box>
+              <Stack direction="row" spacing={1}>
+                <Button variant="outlined" size="small">
+                  Deactivate
+                </Button>
+                <Button size="small">+ Add User</Button>
+              </Stack>
+            </Stack>
+          </Paper>
+          <Box sx={{ maxWidth: 680 }}>
+            <DetailRow label="ID">{detail.id}</DetailRow>
+            <DetailRow label="Public ID">
+              <Typography component="code" variant="body2">
+                {detail.publicId}
+              </Typography>
+            </DetailRow>
+            <DetailRow label="Client code">{detail.clientCode}</DetailRow>
+            <DetailRow label="Legal name">{detail.legalName}</DetailRow>
+            <DetailRow label="Status">{detail.status}</DetailRow>
+            <DetailRow label="Created">{detail.createdAt}</DetailRow>
+            <DetailRow label="Updated">{detail.updatedAt}</DetailRow>
+          </Box>
+        </Stack>
       ) : null}
 
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 3, mb: 0 }}>

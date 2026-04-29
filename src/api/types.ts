@@ -24,10 +24,6 @@ export function canMutateClients(session: AdminSession | null): boolean {
   )
 }
 
-export function canAmlCompliance(session: AdminSession | null): boolean {
-  return hasAuthority(session, 'SUPER_ADMIN') || hasAuthority(session, 'COMPLIANCE_OFFICER')
-}
-
 export function isSuperAdmin(session: AdminSession | null): boolean {
   return hasAuthority(session, 'SUPER_ADMIN')
 }

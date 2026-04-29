@@ -5,10 +5,6 @@ export function getAdminAccessToken(): string | null {
   return sessionStorage.getItem(ACCESS_KEY)
 }
 
-export function setAdminAccessToken(token: string): void {
-  sessionStorage.setItem(ACCESS_KEY, token)
-}
-
 export function clearAdminAccessToken(): void {
   sessionStorage.removeItem(ACCESS_KEY)
   sessionStorage.removeItem(REFRESH_KEY)

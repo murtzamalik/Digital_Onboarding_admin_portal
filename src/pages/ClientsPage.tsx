@@ -86,7 +86,10 @@ export function ClientsPage() {
       }}
     >
       <Typography variant="h6" component="h1" gutterBottom>
-        Corporate clients
+        Companies
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Corporate client directory with onboarding status and quick access.
       </Typography>
 
       {loading ? (
@@ -105,18 +108,18 @@ export function ClientsPage() {
 
       {data && !loading ? (
         <>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {data.totalElements} client{data.totalElements === 1 ? '' : 's'} (page {data.number + 1} of{' '}
             {Math.max(1, data.totalPages)}).
           </Typography>
-          <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>
+          <TableContainer component={Paper} variant="outlined" sx={{ mb: 2, borderRadius: 2 }}>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Legal name</TableCell>
-                  <TableCell>Code</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Public ID</TableCell>
+                  <TableCell sx={{ fontSize: 11, letterSpacing: 0.5 }}>COMPANY</TableCell>
+                  <TableCell sx={{ fontSize: 11, letterSpacing: 0.5 }}>CODE</TableCell>
+                  <TableCell sx={{ fontSize: 11, letterSpacing: 0.5 }}>STATUS</TableCell>
+                  <TableCell sx={{ fontSize: 11, letterSpacing: 0.5 }}>PUBLIC ID</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -127,15 +130,29 @@ export function ClientsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  data.content.map((row) => (
-                    <TableRow key={row.id} hover>
+                  data.content.map((row, index) => (
+                    <TableRow key={row.id} hover sx={{ backgroundColor: index % 2 === 1 ? '#FAFBFC' : '#FFFFFF' }}>
                       <TableCell>
                         <MuiLink component={RouterLink} to={`/clients/${row.id}`} underline="hover">
                           {row.legalName}
                         </MuiLink>
                       </TableCell>
                       <TableCell>{row.clientCode}</TableCell>
-                      <TableCell>{row.status}</TableCell>
+                      <TableCell>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 10,
+                            bgcolor: row.status === 'ACTIVE' ? '#DCFCE7' : '#F1F5F9',
+                            color: row.status === 'ACTIVE' ? '#16A34A' : '#64748B',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {row.status}
+                        </Typography>
+                      </TableCell>
                       <TableCell>
                         <Typography component="code" variant="body2">
                           {row.publicId}
